@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/alfonso-presa/chisel/client"
 	"github.com/alfonso-presa/chisel/server"
@@ -73,7 +74,16 @@ var commonHelp = `
       a SIGHUP to short-circuit the client reconnect timer
 
   Version:
-    ` + chshare.BuildVersion + `
+    ` + chshare.B		Fingerprint:      *fingerprint,
+	Auth:             *auth,
+	KeepAlive:        *keepalive,
+	MaxRetryCount:    *maxRetryCount,
+	MaxRetryInterval: *maxRetryInterval,
+	HTTPProxy:        *proxy,
+	Server:           args[0],
+	Remotes:          args[1:],
+	HostHeader:       *hostname,
+	HttpHeaders:      httpHeaders,uildVersion + `
 
   Read more:
     https://github.com/jpillora/chisel
@@ -134,7 +144,16 @@ var serverHelp = `
 func server(args []string) {
 
 	flags := flag.NewFlagSet("server", flag.ContinueOnError)
-
+	Fingerprint:      *fingerprint,
+	Auth:             *auth,
+	KeepAlive:        *keepalive,
+	MaxRetryCount:    *maxRetryCount,
+	MaxRetryInterval: *maxRetryInterval,
+	HTTPProxy:        *proxy,
+	Server:           args[0],
+	Remotes:          args[1:],
+	HostHeader:       *hostname,
+	HttpHeaders:      httpHeaders,
 	host := flags.String("host", "", "")
 	p := flags.String("p", "", "")
 	port := flags.String("port", "", "")
@@ -188,7 +207,16 @@ func server(args []string) {
 	}
 	go chshare.GoStats()
 	if err = s.Run(*host, *port); err != nil {
-		log.Fatal(err)
+		log.Fatal		Fingerprint:      *fingerprint,
+		Auth:             *auth,
+		KeepAlive:        *keepalive,
+		MaxRetryCount:    *maxRetryCount,
+		MaxRetryInterval: *maxRetryInterval,
+		HTTPProxy:        *proxy,
+		Server:           args[0],
+		Remotes:          args[1:],
+		HostHeader:       *hostname,
+		HttpHeaders:      httpHeaders,(err)
 	}
 }
 
@@ -273,8 +301,24 @@ var clientHelp = `
     is established.
 
     --hostname, Optionally set the 'Host' header (defaults to the host
-    found in the server url).
+	found in the server url).
+
+    --custom-http-header, Custom http header in the form of "name=value".
+    You may add as much as you need.
 ` + commonHelp
+
+type customHeaders []string
+
+func (i *customHeaders) String() string {
+	return "Headers list"
+}
+
+func (i *customHeaders) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
+var myHeaders customHeaders
 
 func client(args []string) {
 
@@ -290,11 +334,17 @@ func client(args []string) {
 	pid := flags.Bool("pid", false, "")
 	hostname := flags.String("hostname", "", "")
 	verbose := flags.Bool("v", false, "")
+	flags.Var(&myHeaders, "custom-http-header", "Custom http header in the form of `name=value`. Can add as much as you need")
 	flags.Usage = func() {
 		fmt.Print(clientHelp)
 		os.Exit(1)
 	}
 	flags.Parse(args)
+	httpHeaders := make(map[string]string)
+	for _, header := range myHeaders {
+		parts := strings.SplitN(header, "=", 2)
+		httpHeaders[parts[0]] = parts[1]
+	}
 	//pull out options, put back remaining args
 	args = flags.Args()
 	if len(args) < 2 {
@@ -314,6 +364,7 @@ func client(args []string) {
 		SkipTlsVerification: *skipTlsVerification,
 		Remotes:          args[1:],
 		HostHeader:       *hostname,
+		HttpHeaders:      httpHeaders,
 	})
 	if err != nil {
 		log.Fatal(err)
