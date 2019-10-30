@@ -14,7 +14,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/jpillora/backoff"
-	"github.com/alfonso-presa/chisel/share"
+	chshare "github.com/jpillora/chisel/share"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -31,6 +31,7 @@ type Config struct {
 	HTTPProxy        string
 	Remotes          []string
 	HostHeader       string
+	HttpHeaders      map[string]string
 }
 
 //Client represents a client instance
@@ -205,10 +206,13 @@ func (c *Client) connectionLoop() {
 			d.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 		}
 		wsHeaders := http.Header{}
-		if c.config.HostHeader != "" {
-			wsHeaders = http.Header{
-				"Host": {c.config.HostHeader},
+		if c.config.HttpHeaders != nil {
+			for key, value := range c.config.HttpHeaders {
+				wsHeaders.Set(key, value)
 			}
+		}
+		if c.config.HostHeader != "" {
+			wsHeaders.Set("Host", c.config.HostHeader)
 		}
 		wsConn, _, err := d.Dial(c.server, wsHeaders)
 		if err != nil {
