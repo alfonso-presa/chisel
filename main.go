@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alfonso-presa/chisel/client"
-	"github.com/alfonso-presa/chisel/server"
+	chclient "github.com/alfonso-presa/chisel/client"
+	chserver "github.com/alfonso-presa/chisel/server"
 	chshare "github.com/alfonso-presa/chisel/share"
 )
 
@@ -74,16 +74,7 @@ var commonHelp = `
       a SIGHUP to short-circuit the client reconnect timer
 
   Version:
-    ` + chshare.B		Fingerprint:      *fingerprint,
-	Auth:             *auth,
-	KeepAlive:        *keepalive,
-	MaxRetryCount:    *maxRetryCount,
-	MaxRetryInterval: *maxRetryInterval,
-	HTTPProxy:        *proxy,
-	Server:           args[0],
-	Remotes:          args[1:],
-	HostHeader:       *hostname,
-	HttpHeaders:      httpHeaders,uildVersion + `
+    ` + chshare.BuildVersion + `
 
   Read more:
     https://github.com/jpillora/chisel
@@ -144,16 +135,7 @@ var serverHelp = `
 func server(args []string) {
 
 	flags := flag.NewFlagSet("server", flag.ContinueOnError)
-	Fingerprint:      *fingerprint,
-	Auth:             *auth,
-	KeepAlive:        *keepalive,
-	MaxRetryCount:    *maxRetryCount,
-	MaxRetryInterval: *maxRetryInterval,
-	HTTPProxy:        *proxy,
-	Server:           args[0],
-	Remotes:          args[1:],
-	HostHeader:       *hostname,
-	HttpHeaders:      httpHeaders,
+
 	host := flags.String("host", "", "")
 	p := flags.String("p", "", "")
 	port := flags.String("port", "", "")
@@ -207,16 +189,7 @@ func server(args []string) {
 	}
 	go chshare.GoStats()
 	if err = s.Run(*host, *port); err != nil {
-		log.Fatal		Fingerprint:      *fingerprint,
-		Auth:             *auth,
-		KeepAlive:        *keepalive,
-		MaxRetryCount:    *maxRetryCount,
-		MaxRetryInterval: *maxRetryInterval,
-		HTTPProxy:        *proxy,
-		Server:           args[0],
-		Remotes:          args[1:],
-		HostHeader:       *hostname,
-		HttpHeaders:      httpHeaders,(err)
+		log.Fatal(err)
 	}
 }
 
@@ -305,6 +278,7 @@ var clientHelp = `
 
     --custom-http-header, Custom http header in the form of "name=value".
     You may add as much as you need.
+
 ` + commonHelp
 
 type customHeaders []string
@@ -354,17 +328,17 @@ func client(args []string) {
 		*auth = os.Getenv("AUTH")
 	}
 	c, err := chclient.NewClient(&chclient.Config{
-		Fingerprint:      *fingerprint,
-		Auth:             *auth,
-		KeepAlive:        *keepalive,
-		MaxRetryCount:    *maxRetryCount,
-		MaxRetryInterval: *maxRetryInterval,
-		HTTPProxy:        *proxy,
-		Server:           args[0],
+		Fingerprint:         *fingerprint,
+		Auth:                *auth,
+		KeepAlive:           *keepalive,
+		MaxRetryCount:       *maxRetryCount,
+		MaxRetryInterval:    *maxRetryInterval,
+		HTTPProxy:           *proxy,
+		Server:              args[0],
 		SkipTlsVerification: *skipTlsVerification,
-		Remotes:          args[1:],
-		HostHeader:       *hostname,
-		HttpHeaders:      httpHeaders,
+		Remotes:             args[1:],
+		HostHeader:          *hostname,
+		HttpHeaders:         httpHeaders,
 	})
 	if err != nil {
 		log.Fatal(err)
