@@ -12,26 +12,26 @@ import (
 	"strings"
 	"time"
 
+	chshare "github.com/alfonso-presa/chisel/share"
 	"github.com/gorilla/websocket"
 	"github.com/jpillora/backoff"
-	chshare "github.com/jpillora/chisel/share"
 	"golang.org/x/crypto/ssh"
 )
 
 //Config represents a client configuration
 type Config struct {
-	shared           *chshare.Config
-	Fingerprint      string
-	Auth             string
-	KeepAlive        time.Duration
-	MaxRetryCount    int
-	MaxRetryInterval time.Duration
-	Server           string
+	shared              *chshare.Config
+	Fingerprint         string
+	Auth                string
+	KeepAlive           time.Duration
+	MaxRetryCount       int
+	MaxRetryInterval    time.Duration
+	Server              string
 	SkipTlsVerification bool
-	HTTPProxy        string
-	Remotes          []string
-	HostHeader       string
-	HttpHeaders      map[string]string
+	HTTPProxy           string
+	Remotes             []string
+	HostHeader          string
+	HttpHeaders         map[string]string
 }
 
 //Client represents a client instance
